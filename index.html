@@ -1,0 +1,164 @@
+<html><head><base href="https://websimulator.com/futuristic-regression/">
+<title>Futuristic Regression Simulator</title>
+<style>
+    body, html {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        font-family: 'Arial', sans-serif;
+        background-color: #0a0a0a;
+        color: #00ffff;
+        overflow: hidden;
+    }
+    .container {
+        display: flex;
+        height: 100vh;
+    }
+    .controls {
+        width: 30%;
+        padding: 20px;
+        background-color: rgba(0, 255, 255, 0.1);
+        border-right: 1px solid #00ffff;
+    }
+    .graph {
+        width: 70%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.8);
+    }
+    h1 {
+        font-size: 24px;
+        margin-bottom: 20px;
+        text-align: center;
+        text-shadow: 0 0 10px #00ffff;
+    }
+    .slider-container {
+        margin-bottom: 20px;
+    }
+    label {
+        display: block;
+        margin-bottom: 5px;
+    }
+    input[type="range"] {
+        width: 100%;
+        -webkit-appearance: none;
+        background: #000;
+        outline: none;
+        opacity: 0.7;
+        transition: opacity 0.2s;
+    }
+    input[type="range"]:hover {
+        opacity: 1;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 20px;
+        height: 20px;
+        background: #00ffff;
+        cursor: pointer;
+        border-radius: 50%;
+    }
+    input[type="range"]::-moz-range-thumb {
+        width: 20px;
+        height: 20px;
+        background: #00ffff;
+        cursor: pointer;
+        border-radius: 50%;
+    }
+    .equation {
+        font-size: 18px;
+        text-align: center;
+        margin-top: 20px;
+    }
+</style>
+</head>
+<body>
+<div class="container">
+    <div class="controls">
+        <h1>Futuristic Regression Simulator</h1>
+        <div class="slider-container">
+            <label for="slope">Slope (m):</label>
+            <input type="range" id="slope" min="-5" max="5" step="0.1" value="0.2">
+        </div>
+        <div class="slider-container">
+            <label for="intercept">Intercept (b):</label>
+            <input type="range" id="intercept" min="-10" max="10" step="0.1" value="2.7">
+        </div>
+        <div class="slider-container">
+            <label for="noise">Noise Factor:</label>
+            <input type="range" id="noise" min="0" max="5" step="0.1" value="1">
+        </div>
+        <div class="slider-container">
+            <label for="points">Number of Points:</label>
+            <input type="range" id="points" min="10" max="500" step="10" value="200">
+        </div>
+        <div class="equation" id="equation">
+            y = 0.20x + 2.70
+        </div>
+    </div>
+    <div class="graph" id="graph"></div>
+</div>
+
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script>
+    const slope = document.getElementById('slope');
+    const intercept = document.getElementById('intercept');
+    const noise = document.getElementById('noise');
+    const points = document.getElementById('points');
+    const equation = document.getElementById('equation');
+
+    function generateData() {
+        const m = parseFloat(slope.value);
+        const b = parseFloat(intercept.value);
+        const n = parseFloat(noise.value);
+        const count = parseInt(points.value);
+
+        const x = Array.from({length: count}, () => Math.random() * 20 - 10);
+        const y = x.map(xi => m * xi + b + (Math.random() - 0.5) * n);
+
+        return {x, y};
+    }
+
+    function updatePlot() {
+        const {x, y} = generateData();
+        const m = parseFloat(slope.value);
+        const b = parseFloat(intercept.value);
+
+        const trace1 = {
+            x: x,
+            y: y,
+            mode: 'markers',
+            type: 'scatter',
+            marker: {color: '#00ffff', size: 5}
+        };
+
+        const trace2 = {
+            x: [-10, 10],
+            y: [-10*m+b, 10*m+b],
+            mode: 'lines',
+            type: 'scatter',
+            line: {color: '#ff00ff', width: 2}
+        };
+
+        const layout = {
+            paper_bgcolor: 'rgba(0,0,0,0)',
+            plot_bgcolor: 'rgba(0,0,0,0)',
+            xaxis: {range: [-10, 10], gridcolor: '#333', zerolinecolor: '#666'},
+            yaxis: {range: [-10, 10], gridcolor: '#333', zerolinecolor: '#666'},
+            font: {color: '#00ffff'},
+            margin: {l: 40, r: 40, t: 40, b: 40}
+        };
+
+        Plotly.newPlot('graph', [trace1, trace2], layout);
+        equation.textContent = `y = ${m.toFixed(2)}x + ${b.toFixed(2)}`;
+    }
+
+    slope.addEventListener('input', updatePlot);
+    intercept.addEventListener('input', updatePlot);
+    noise.addEventListener('input', updatePlot);
+    points.addEventListener('input', updatePlot);
+
+    updatePlot();
+</script>
+</body>
+</html>
